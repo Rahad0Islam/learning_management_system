@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { upload } from "../Middleware/Multer.Middleware.js";
-import { addBankAccount, ChangePassword, LogIn, LogOut, Register, RenewAccesToken,
+import { addBalance, addBankAccount, ChangePassword, LogIn, LogOut, Register, RenewAccesToken,
       UpdateProfilePic
      } from "../Controllers/user.controller.js";
 import { jwtVerification } from "../Middleware/Authentication.Middleware.js";
@@ -29,6 +29,7 @@ router.route("/UpdateProfilePicture").patch(
     jwtVerification,UpdateProfilePic)
 
 router.route("/addbankaccount").post(jwtVerification,addBankAccount)
+router.route("/addBalance").post(jwtVerification,addBalance)
 
 
 // router.route('/profile/:id').get(GetUserPublicProfile)

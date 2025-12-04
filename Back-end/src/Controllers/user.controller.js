@@ -258,7 +258,9 @@ const addBankAccount=AsynHandler(async(req,res)=>{
     if(!user){
         throw new ApiError(401,"userID not valid");
     }
-
+    if(user.accountNumber!=null){
+        throw new ApiError(401,"already accountNumber exist");
+    }
     user.accountNumber=accountNumber;
     user.secretKey=secretKey;
     await user.save({validateBeforeSave:false});
@@ -272,6 +274,36 @@ const addBankAccount=AsynHandler(async(req,res)=>{
     )
 })
 
+const addBalance=AsynHandler(async(req,res)=>{
+          
+    const {balance,secretKey}=req.body;
+   
+    if(!balance || !secretKey){
+        throw new ApiError(401,"balance and secretkey are required ")
+    }
+
+    if(balance<0){
+        throw new ApiError(401,"balance can not negative ");
+    }
+
+    const user=await User.findById(req.user?._id);
+    if(!user){
+        throw new ApiError(401,"userID not valid");
+    }
+    const IsSecretCorr=await user.IssecretKeyCorrect(secretKey);
+    if(!IsSecretCorr)throw new ApiError(401,"secret key invalid");
+
+    user.balance=Number(balance)+Number(user.balance);
+    await user.save({validateBeforeSave:false});
+    console.log("balance add successfully current balace ",user.balance);
+     const currUser=await User.findById(req.user?._id).select("-RefreshToken -Password -secretKey")
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(201,currUser,"balance add succesfully! ")
+    )
+})
+
 export {
     Register,
     LogIn,
@@ -280,5 +312,6 @@ export {
     ChangePassword,
     UpdateProfilePic,
     // GetUserPublicProfile,
-    addBankAccount
+    addBankAccount,
+    addBalance
 }

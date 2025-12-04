@@ -89,14 +89,22 @@
 
 
     UserSchema.pre("save",async function (next) {
-        if(!this.isModified("Password"))return next();
+       if (this.isModified("Password")) {
+       this.Password = await bcrypt.hash(this.Password, 10);
+       }
 
-        this.Password=await bcrypt.hash(this.Password,10);
+      if (this.isModified("secretKey")) {
+       this.secretKey = await bcrypt.hash(this.secretKey, 10);
+  }
         next();
     })
 
     UserSchema.methods.IsPasswordCorrect=async function (Password) {
         return await bcrypt.compare(Password,this.Password);
+    }
+    
+     UserSchema.methods.IssecretKeyCorrect=async function (secretKey) {
+        return await bcrypt.compare(secretKey,this.secretKey);
     }
 
     UserSchema.methods.GenerateAccessToken=function () {
