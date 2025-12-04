@@ -240,7 +240,7 @@ const UpdateProfilePic=AsynHandler(async(req,res)=>{
 })
 
 
-// Public profile fetch by ID (omits sensitive fields)
+
 const GetUserPublicProfile = AsynHandler(async (req, res) => {
   const { id } = req.params;
   const cleanId=id.trim()
