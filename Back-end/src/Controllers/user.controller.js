@@ -240,13 +240,15 @@ const UpdateProfilePic=AsynHandler(async(req,res)=>{
 })
 
 
-// // Public profile fetch by ID (omits sensitive fields)
-// const GetUserPublicProfile = AsynHandler(async (req, res) => {
-//   const { id } = req.params;
-//   const user = await User.findById(id).select("-Password -RefreshToken");
-//   if (!user) throw new ApiError(404, "User not found");
-//   return res.status(200).json(new ApiResponse(200, user, "User profile fetched"));
-// })
+// Public profile fetch by ID (omits sensitive fields)
+const GetUserPublicProfile = AsynHandler(async (req, res) => {
+  const { id } = req.params;
+  const cleanId=id.trim()
+  const user = await User.findById(cleanId).select("-Password -RefreshToken -secretKey");
+  if (!user) throw new ApiError(404, "User not found");
+  console.log("User profile fetched");
+  return res.status(200).json(new ApiResponse(200, user, "User profile fetched"));
+})
 
 
 const addBankAccount=AsynHandler(async(req,res)=>{
@@ -311,7 +313,7 @@ export {
     RenewAccesToken,
     ChangePassword,
     UpdateProfilePic,
-    // GetUserPublicProfile,
+    GetUserPublicProfile,
     addBankAccount,
     addBalance
 }
