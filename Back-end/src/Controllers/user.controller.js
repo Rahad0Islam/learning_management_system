@@ -248,6 +248,30 @@ const UpdateProfilePic=AsynHandler(async(req,res)=>{
 //   return res.status(200).json(new ApiResponse(200, user, "User profile fetched"));
 // })
 
+
+const addBankAccount=AsynHandler(async(req,res)=>{
+    const {accountNumber,secretKey} = req.body;
+    if(!accountNumber || !secretKey){
+        throw new ApiError(401,"accountNumber and SecretKey are needed ");
+    }
+    const user=await User.findById(req.user?._id);
+    if(!user){
+        throw new ApiError(401,"userID not valid");
+    }
+
+    user.accountNumber=accountNumber;
+    user.secretKey=secretKey;
+    await user.save({validateBeforeSave:false});
+
+    console.log("Bank account added succesfully! ");
+    const currUser=await User.findById(req.user?._id).select("-RefreshToken -Password -secretKey")
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(201,currUser,"Bank account added succesfully! ")
+    )
+})
+
 export {
     Register,
     LogIn,
@@ -256,4 +280,5 @@ export {
     ChangePassword,
     UpdateProfilePic,
     // GetUserPublicProfile,
+    addBankAccount
 }

@@ -74,7 +74,7 @@
             type:String,
             default:null
         },
-        secret:{
+        secretKey:{
         type:String,
             default:null
         },
