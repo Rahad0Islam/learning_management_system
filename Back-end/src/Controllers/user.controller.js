@@ -4,9 +4,6 @@ import { ApiResponse } from "../Utils/ApiResponse.js";
 import { AsynHandler } from "../Utils/AsyncHandler.js";
 import { FileDelete, FileUpload } from "../Utils/Cloudinary.js";
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import fs from 'fs'
-import { transporter } from "../Middleware/Email.config.js";
 
 const Option={
     httpOnly:true,
@@ -46,6 +43,7 @@ const Register=AsynHandler(async(req,res)=>{
     }
   
     console.log(ProfileImageLocalPath);
+
 
 
     const ProfileImage=await FileUpload(ProfileImageLocalPath);

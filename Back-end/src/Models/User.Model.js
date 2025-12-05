@@ -72,7 +72,8 @@
         //bank info
         accountNumber:{
             type:String,
-            default:null
+            default:null,
+            unique:true
         },
         secretKey:{
         type:String,

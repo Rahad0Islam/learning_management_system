@@ -14,6 +14,16 @@ const CourseSchema=new mongoose.Schema({
         required:true,
         min: 0
      },
+
+     courseImage:{
+        type:String,
+        required:true,
+     },
+     courseImagePublicID:{
+        type:String,
+        required:true
+     },
+     
      owner:{
          type: mongoose.Schema.Types.ObjectId,
         ref:"User",
@@ -29,13 +39,18 @@ const CourseSchema=new mongoose.Schema({
         enum:["available","unavailable","pending"],
         default:"pending"
 
+     },
+     startTime:{
+       type:Date,
+       default:null
+     },
+
+     totalEnrolled:{
+      type:Number,
+      default:0
      }
 
-    //material
     
-
-
-
 
 },{timestamps:true});
 
