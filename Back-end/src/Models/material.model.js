@@ -1,21 +1,49 @@
 import mongoose from "mongoose";
 const materialSchema=new mongoose.Schema({
-  course:{
+ 
+  courseID:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"Course",
     required:true
   },
-
+   title:{
+    type:String,
+    
+  },
+  description:{
+    type:String,
+   
+  },
+  
   materialType:{
      type:String,
-     enum:['text','audio','mcq','video'],
+     enum:['text','audio','mcq','video','picture'],
      required:true  
   },
+ 
+   //material
+      text:{
+         type:String
+      },
 
-  materialContent:{
-    type:String,
-    required:true,
-  },
+       picture:
+      [{
+        url: { type: String },
+        publicId: { type: String }
+     }],
+
+       video:
+      [{
+        url: { type: String },
+        publicId: { type: String }
+     }],
+
+      audio:[{
+        url:{type:String},
+        publicId:{type:String}
+      }],
+   
+  
   questions: [  //mcq
       {
         question: { type: String },
