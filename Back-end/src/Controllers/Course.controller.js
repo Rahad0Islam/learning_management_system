@@ -71,8 +71,12 @@ const addCourse=AsynHandler(async(req,res)=>{
 })
 
 
+const courseEnroll=AsynHandler(async(req,res)=>{
+      const {courseID}=req.body;
+})
 
 export{
     addCourse,
+    courseEnroll
 
 }

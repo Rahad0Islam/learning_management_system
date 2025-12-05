@@ -10,7 +10,7 @@ import { Material } from "../Models/material.model.js";
 
 const addMaterial=AsynHandler(async(req,res)=>{
       const {title,description,courseID,materialType,text,mcq} =req.body;
-      console.log(mcq);
+      
       if( !courseID || !materialType){
         throw new ApiError(401,"all Feilds are required! ");
       }
@@ -77,18 +77,21 @@ const addMaterial=AsynHandler(async(req,res)=>{
      throw new ApiError(400, "upload must contain at least one of: text or  picture or audio or video or mcq");
   }
 
-    let  questions=null;
-    if(mcq){
-    const MCQ = JSON.parse(mcq);
-    questions = Array.isArray(MCQ)
-    ? MCQ.map(q => ({
-        question: q.question,
-        options: q.options,
-        answer: q.answer
-      })):[];
-     
-    //  console.log(questions);
+    let questions = [];
+  if (mcq) {
+    try {
+      const parsed = JSON.parse(mcq);
+      if (Array.isArray(parsed)) {
+        questions = parsed.map(q => ({
+          question: q.question,
+          options: q.options,
+          answer: q.answer
+        }));
+      }
+    } catch (err) {
+      throw new ApiError(400, "Invalid MCQ format, must be valid JSON");
     }
+  }
    const material=await Material.create({
      courseID,
      title,
@@ -113,6 +116,14 @@ const addMaterial=AsynHandler(async(req,res)=>{
 })
 
 
+
+const getAllmaterial=AsynHandler(async(req,res)=>{
+     const {courseID}= req.body;
+
+     
+
+})
 export{
-    addMaterial
+    addMaterial,
+    getAllmaterial
 }
