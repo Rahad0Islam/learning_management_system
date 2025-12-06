@@ -15,9 +15,11 @@ class transaction{
         throw new Error("Invalid user IDs");
         }
         const bank=await Bank.create({
+           fromBankaccoutNumber:fromuser.accountNumber,
            fromUserID:this.fromUser,
            fromUserName:fromuser.UserName,
            fromUserEmail:fromuser.Email,
+           toBankaccoutNumber:touser.accountNumber,
            toUserID:this.toUser,
            toUserName:touser.UserName,
            toUserEmail:touser.Email,

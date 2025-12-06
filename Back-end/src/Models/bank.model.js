@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 
 
 const bankSchema= new mongoose.Schema({
-
+    
+    fromBankaccoutNumber:{
+        type:String,
+        required:true
+    },
     fromUserID:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
@@ -26,6 +30,10 @@ const bankSchema= new mongoose.Schema({
         required:true
     },
     toUserEmail:{
+        type:String,
+        required:true
+    },
+    toBankaccoutNumber:{
         type:String,
         required:true
     },

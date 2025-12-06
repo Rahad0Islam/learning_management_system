@@ -4,6 +4,7 @@ import { upload } from "../Middleware/Multer.Middleware.js";
 import { jwtVerification } from "../Middleware/Authentication.Middleware.js";
 import { addCourse, courseEnroll } from "../Controllers/Course.controller.js";
 import { addMaterial } from "../Controllers/material.controller.js";
+import { approvedEnroll } from "../Controllers/admin.controller.js";
 const router=Router();
 
 
@@ -41,6 +42,8 @@ router.route("/contentUpload").post(
 
 
 router.route("/courseEnroll").post(jwtVerification,courseEnroll)
+
+router.route("/approvedEnroll").post(jwtVerification,approvedEnroll);
 
 
 export default router
