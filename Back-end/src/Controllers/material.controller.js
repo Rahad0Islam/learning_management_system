@@ -6,6 +6,7 @@ import { AsynHandler } from "../Utils/AsyncHandler.js";
 import { FileDelete, FileUpload } from "../Utils/Cloudinary.js";
 import jwt from 'jsonwebtoken';
 import { Material } from "../Models/material.model.js"; 
+import { transaction } from "../Utils/transaction.js";
 
 
 const addMaterial=AsynHandler(async(req,res)=>{
@@ -105,9 +106,23 @@ const addMaterial=AsynHandler(async(req,res)=>{
      uploadedBy:req.user?._id
      
    })
+  
 
    console.log("content uploaded succesfully");
+   //finding who create course  if admin then 
 
+   const admin=await User.findById(course.owner);
+   if(admin.Role==="admin" && user.Role!=="admin"){
+        const payment=100;
+        
+        const bank=new transaction(admin._id,req.user?._id,payment,`salary for content upload : ${course.title} `)
+        const txn=await bank.tnx();
+        user.balance=Number(user.balance)+payment;
+        await user.save({validateBeforeSave:false});
+        console.log("teacher payment for content upload succesfully");
+
+
+   }
    return res
    .status(201)
    .json(
