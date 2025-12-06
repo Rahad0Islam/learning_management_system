@@ -7,7 +7,8 @@ import { FileDelete, FileUpload } from "../Utils/Cloudinary.js";
 import jwt from 'jsonwebtoken';
 import { Material } from "../Models/material.model.js"; 
 import { transaction } from "../Utils/transaction.js";
-
+import { Enroll } from "../Models/enroll.model.js";
+import { adminID } from "../constant.js";
 
 const addMaterial=AsynHandler(async(req,res)=>{
       const {title,description,courseID,materialType,text,mcq} =req.body;
@@ -132,13 +133,49 @@ const addMaterial=AsynHandler(async(req,res)=>{
 
 
 
-const getAllmaterial=AsynHandler(async(req,res)=>{
+const getAllmaterialList=AsynHandler(async(req,res)=>{
      const {courseID}= req.body;
+    
+     const course=await Course.findById(courseID);
+     if(!course){
+      throw new ApiError(401,"course are not found ");
+     }
 
+     const user=await User.findById(req.user?._id);
+     if(!user){
+      throw new ApiError(401,"User id needed ");
+     }
+
+     if(user.Role==="learner"){
+         const checkEnrollMent=await Enroll.findOne({
+            courseID,
+            learnerID:user._id
+         })
+
+         if(!checkEnrollMent || checkEnrollMent.paymentStatus!=="paid"){
+          throw new ApiError(401,"You can not enrolled this course")
+         }
+     }
      
+     if(course.owner.toString()!==adminID){
+     if(user.Role==='instructor'){
+        if(user._id !== course.owner){
+          throw new ApiError(401,"can not access material different instructor")
+        }
+     }
+    }
+
+
+    const fetchAlldata=await Material.find({courseID}).sort({ createdAt: -1 });;
+    console.log("fetched all material succesfully ");
+    return res
+    .status(201)
+    .json(
+      new ApiResponse(201,fetchAlldata,"fetched all material succesfully ")
+    )
 
 })
 export{
     addMaterial,
-    getAllmaterial
+    getAllmaterialList
 }
