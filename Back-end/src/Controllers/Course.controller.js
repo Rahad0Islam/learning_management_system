@@ -106,7 +106,9 @@ const courseEnroll=AsynHandler(async(req,res)=>{
         throw new ApiError(501,"course not found");
       }
 
-
+     if(course.isActive==false){
+        throw new ApiError(401,"course are not availabe ")
+     }
       if(price!=course.price){
         throw new ApiError(401,"price are not same")
       }

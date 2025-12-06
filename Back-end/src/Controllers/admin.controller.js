@@ -96,7 +96,61 @@ const approvedEnroll=AsynHandler(async(req,res)=>{
     )
 })
 
+const approvedCourse=AsynHandler(async(req,res)=>{
+     const {courseID,courseLanchPayment}=req.body;
+
+     if(!courseID){
+        throw new ApiError(401,"courseID are needed");
+     }
+
+     if(!courseLanchPayment){
+        throw new ApiError(401,"courseLanchPayment is needed");
+     }
+
+     const course=await Course.findById(courseID);
+     if(!course){
+        throw new ApiError(401,"course not found ");
+     }
+
+     const admin =await User.findById(req.user?._id);
+     if(!admin || admin.Role!=="admin"){
+        throw new ApiError(401,"only admin can approved the course ")
+     }
+
+     if(admin.balance<courseLanchPayment){
+        throw new ApiError(401,"insufficient balance");
+     }
+
+     //balance update
+     const teacher= await User.findById(course.owner);
+     teacher.balance=Number(teacher.balance)+Number(courseLanchPayment);
+     admin.balance=Number(admin.balance)-courseLanchPayment
+     const bank=new transaction(admin._id,teacher?._id,courseLanchPayment,`salary for courseLanch ${course.title}`);
+     const txn=await bank.tnx();
+
+     const bankCheck=await Bank.findById(txn);
+     bankCheck.status="success";
+    //course update
+
+     course.isActive=true;
+     course.status="available";
+     await teacher.save({validateBeforeSave:false});
+     await course.save({validateBeforeSave:false});
+     await admin.save({validateBeforeSave:false});
+     await bankCheck.save({validateBeforeSave:false});
+
+    console.log("Course approved and salary given succesfully");
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(201,bankCheck,"Course approved and salary given succesfully")
+    )
+
+
+
+})
 
 export{
-    approvedEnroll
+    approvedEnroll,
+    approvedCourse
 }
