@@ -18,7 +18,7 @@ const enrollSchema=new mongoose.Schema({
      },
      paymentStatus:{
         type:String,
-        enum: ["paid", "unpaid", "refunded"],
+        enum: ["paid", "unpaid", "refunded","pending"],
         default:"unpaid"
      },
 
