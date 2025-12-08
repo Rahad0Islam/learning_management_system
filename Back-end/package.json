@@ -1,7 +1,7 @@
 {
-  "name": "e-votehub2.0",
+  "name": "lms2.0",
   "version": "1.0.0",
-  "description": "Digital voting System and Online campign",
+  "description": "Learning_management_system",
   "main": "index.js",
   "type": "module",
   "scripts": {
