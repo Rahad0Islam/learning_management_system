@@ -131,6 +131,93 @@ const addMaterial=AsynHandler(async(req,res)=>{
    )
 })
 
+const updateMaterial = AsynHandler(async (req, res) => {
+  const { materialID, title, description, text, mcq } = req.body;
+  const user = await User.findById(req.user?._id);
+
+  if (!user) throw new ApiError(401, "User not valid");
+  if (user.Role !== "admin" && user.Role !== "instructor") {
+    throw new ApiError(403, "Only admin or instructor can update material");
+  }
+
+  const material = await Material.findById(materialID);
+  if (!material) throw new ApiError(404, "Material not found");
+
+ 
+  if (user.Role !== "admin" && material.uploadedBy.toString() !== user._id.toString()) {
+    throw new ApiError(403, "You cannot update another instructor's material");
+  }
+
+  
+  if (title) material.title = title;
+  if (description) material.description = description;
+  if (text) material.text = text;
+
+  if (mcq) {
+    try {
+      const parsed = JSON.parse(mcq);
+      if (Array.isArray(parsed)) {
+        material.questions = parsed.map(q => ({
+          question: q.question,
+          options: q.options,
+          answer: q.answer
+        }));
+      }
+    } catch (err) {
+      throw new ApiError(400, "Invalid MCQ format, must be valid JSON");
+    }
+  }
+
+ 
+  if (req.files?.picture) {
+    for (const pic of material.picture) {
+      await FileDelete(pic.publicId, "image");
+    }
+    material.picture = [];
+    for (const pic of req.files.picture) {
+      const LocalPath = await FileUpload(pic.path);
+      if (LocalPath) {
+        material.picture.push({ url: LocalPath.url, publicId: LocalPath.public_id });
+      }
+    }
+  }
+
+  if (req.files?.video) {
+    for (const vid of material.video) {
+      await FileDelete(vid.publicId, "video");
+    }
+    material.video = [];
+    for (const vid of req.files.video) {
+      const LocalPath = await FileUpload(vid.path);
+      if (LocalPath) {
+        material.video.push({
+          url: LocalPath.url,
+          publicId: LocalPath.public_id,
+          duration: LocalPath.duration
+        });
+      }
+    }
+  }
+
+  if (req.files?.audio) {
+    for (const aud of material.audio) {
+      await FileDelete(aud.publicId, "video"); 
+    }
+    material.audio = [];
+    for (const aud of req.files.audio) {
+      const LocalPath = await FileUpload(aud.path);
+      if (LocalPath) {
+        material.audio.push({ url: LocalPath.url, publicId: LocalPath.public_id });
+      }
+    }
+  }
+
+  await material.save({ validateBeforeSave: false });
+
+  return res.status(200).json(
+    new ApiResponse(200, material, "Material updated successfully (Cloudinary files replaced)")
+  );
+});
 
 
 const getAllmaterialList=AsynHandler(async(req,res)=>{
@@ -177,5 +264,6 @@ const getAllmaterialList=AsynHandler(async(req,res)=>{
 })
 export{
     addMaterial,
-    getAllmaterialList
+    getAllmaterialList,
+    updateMaterial
 }
