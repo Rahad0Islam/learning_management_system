@@ -32,6 +32,10 @@ const enrollSchema=new mongoose.Schema({
         type:Boolean,
         default:false
      },
+     certificateID:{
+      type:String
+     },
+
      progress:{
         type:Number,
         default:0,

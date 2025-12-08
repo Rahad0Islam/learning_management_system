@@ -8,7 +8,7 @@ import { FileDelete, FileUpload } from "../Utils/Cloudinary.js";
 import jwt from 'jsonwebtoken';
 import { transaction } from "../Utils/transaction.js";
 import { Bank } from "../Models/bank.model.js";
-
+import { Certificate } from "../Models/certificate.model.js";
 
 const approvedEnroll=AsynHandler(async(req,res)=>{
     
@@ -159,7 +159,46 @@ const approvedCourse=AsynHandler(async(req,res)=>{
 })
 
 
+const issueCertificate = AsynHandler(async (req, res) => {
+  const { courseID, learnerID } = req.body;
+  const adminID = req.user?._id;
+
+  const admin = await User.findById(adminID);
+  if (!admin || admin.Role !== "admin") {
+    throw new ApiError(403, "Only admin can issue certificates");
+  }
+
+  const enroll = await Enroll.findOne({ courseID, learnerID });
+  if (!enroll) throw new ApiError(404, "Enrollment not found");
+
+  if (enroll.progress < 80) {
+    throw new ApiError(400, "Learner has not reached 80% progress");
+  }
+
+  if (enroll.certificateIssued) {
+    throw new ApiError(400, "Certificate already issued");
+  }
+
+  const certificate = await Certificate.create({
+    courseID,
+    learnerID,
+    issuedBy: adminID,
+    certificateCode: `CERTIFICATE-${Date.now()}-${learnerID}`
+  });
+
+  enroll.status = "completed";
+  enroll.certificateIssued = true;
+  enroll.certificateID = certificate._id;
+  await enroll.save();
+
+  return res.status(201).json(
+    new ApiResponse(201, certificate, "Certificate issued successfully")
+  );
+});
+
+
 export{
     approvedEnroll,
-    approvedCourse
+    approvedCourse,
+    issueCertificate
 }

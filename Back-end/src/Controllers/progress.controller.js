@@ -63,7 +63,7 @@ const updateProgress = AsynHandler(async (req, res) => {
 
   if (courseProgress >= 100 && !enroll.certificateIssued) {
     enroll.status = "completed";
-    enroll.certificateIssued = true;
+    // enroll.certificateIssued = true;
     await enroll.save({validateBeforeSave:false});
   }
   
