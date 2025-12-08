@@ -35,7 +35,8 @@ const materialSchema=new mongoose.Schema({
        video:
       [{
         url: { type: String },
-        publicId: { type: String }
+        publicId: { type: String },
+        duration: { type: Number }
      }],
 
       audio:[{

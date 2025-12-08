@@ -50,7 +50,7 @@ const addMaterial=AsynHandler(async(req,res)=>{
         try {
             const LocalPath = await FileUpload(vid.path);
             if(LocalPath){
-                videoLocalPath.push({ url: LocalPath.url, publicId: LocalPath.public_id });
+                videoLocalPath.push({ url: LocalPath.url, publicId: LocalPath.public_id,duration:LocalPath.duration });
             }
         } catch (e) {
             console.error('Video upload failed:', e?.message || e);
